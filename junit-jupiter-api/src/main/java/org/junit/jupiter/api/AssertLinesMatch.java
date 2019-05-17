@@ -13,7 +13,6 @@ package org.junit.jupiter.api;
 import static java.lang.String.format;
 import static java.lang.String.join;
 import static org.junit.jupiter.api.AssertionUtils.buildPrefix;
-import static org.junit.jupiter.api.AssertionUtils.failNotEqual;
 import static org.junit.jupiter.api.AssertionUtils.nullSafeGet;
 import static org.junit.platform.commons.util.Preconditions.condition;
 import static org.junit.platform.commons.util.Preconditions.notNull;
@@ -164,11 +163,13 @@ class AssertLinesMatch {
 			actualLines.subList(0, MAX_SNIPPET_LENGTH);
 		}
 		String newLine = System.lineSeparator();
-		String expected = newLine + join(newLine, expectedLines) + newLine;
-		String actual = newLine + join(newLine, actualLines) + newLine;
+		String expected = join(newLine, expectedLines);
+		String actual = join(newLine, actualLines);
 		String prefix = buildPrefix(nullSafeGet(messageOrSupplier));
 		String message = prefix + format(format, args);
-		failNotEqual(expected, actual, message);
+		String formattedMessage = AssertionUtils.format(newLine + expected + newLine, newLine + actual + newLine,
+			message);
+		AssertionUtils.fail(formattedMessage, expected, actual);
 	}
 
 	static boolean isFastForwardLine(String line) {
